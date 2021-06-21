@@ -1,0 +1,108 @@
+import speech_recognition as sr
+from gtts import gTTS
+from playsound import playsound #playsound is a module which contains playsound function used to playsound
+import smtplib
+import imaplib
+import email
+
+#google text to speech
+## fetching project name 
+print('             Welcome! To Voice Based Email for Blind') 
+project = gTTS(text = 'Project: Voice Based Email for blind', lang = 'en')
+project.save('fetching.mp3')
+playsound('fetching.mp3')
+## choosing the option
+print('1. Compose a mail')
+myobj1 = gTTS(text = 'Option 1 compose a mail', lang = 'en')
+myobj1.save('option1.mp3')
+playsound('option1.mp3')
+print('2. Read a mail')
+myobj2 = gTTS(text = 'Option 2 reed a mail', lang = 'en')
+myobj2.save('option2.mp3')
+playsound('option2.mp3')
+
+choice = gTTS(text = 'Choose one option', lang = 'en')
+choice.save('choose.mp3')
+playsound('choose.mp3')
+
+#VOICE RECOGNITION
+r = sr.Recognizer()
+r.energy_threshold = 100
+
+with sr.Microphone() as source:
+    print('Say')
+    r.adjust_for_ambient_noise(source)
+    audio = r.record(source, duration=3)
+try:
+    text = r.recognize_google(audio)
+    print('Your Choice: ' +text)
+except sr.UnknownValueError:
+    print("Google Speech Recognition could not understand audio.")
+
+#FOR COMPOSING A MAIL
+if text == '1' or text == 'one' or text == 'One' or text == 'won' or text == 'option 1':
+    myobj3 = gTTS(text ='You chose option 1.', lang = 'en')
+    myobj3.save('compose.mp3')
+    playsound('compose.mp3')
+    emailList = ['arunkgarg18@gmail.com','shreyagarg292001@gmail.com','pranshu040405@gmail.com','shanug2001@gmail.com']
+    # sending mail to gmail accout
+    for dest in emailList:
+        smail = smtplib.SMTP('smtp.gmail.com', 587)  ## creating SMTP session
+        smail.ehlo()
+        smail.starttls() ## creting tls for security
+        smail.ehlo()
+        smail.login('shrugarg29@gmail.com','shreyagarg@29')  ## authetication
+        ## Message to be sent
+        msg = 'Hi! hope you are doing well'
+        ## Sending mail
+        smail.sendmail('shrugarg29@gmail.com', dest, msg)
+        print('\nCongratulations! Your mail has been send.')
+        myobj4 = gTTS(text = 'Congratulations! Your mail has been send.', lang = 'en')
+        myobj4.save('confirm.mp3')
+        playsound('confirm.mp3')
+        smail.quit() ## terminate the session
+
+#FOR READING INBOX
+if text == '2' or text =='two' or text == 'tu' or text == 'Tu' or text == 'too' or text == 'option 2' or text == 'second':
+    myobj5 = gTTS(text = 'You chose option 2.', lang = 'en')
+    myobj5.save('read.mp3')
+    playsound('read.mp3')
+
+    mail = imaplib.IMAP4_SSL('imap.gmail.com') ## imaplib module implements connection based on IMAPv4 protocol
+    mail.login('shrugarg29@gmail.com','shreyagarg@29')
+
+    mail.list() ## listing all labels in gmail
+    mail.select('inbox') ## connecting to inbox
+
+    result, data = mail.uid('search', None, "ALL")
+    i = len(data[0].split()) ### data[0] is space separate string
+    for x in range(i):
+        latestEmailString = data[0].split()[x] ### unique ids wrt label selected
+        result, emailData = mail.uid('fetch', latestEmailString, '(RFC822)')
+        ## fetch email body RFC822 for given ID
+
+        rawEmail = emailData[0][1]
+        rawEmailString = rawEmail.decode('utf-8')
+        ### Converting byte literals to string removing b
+        emailMsg = email.message_from_string(rawEmailString)
+
+        print ("From: "+emailMsg['From'])
+        print ("Subject: "+str(emailMsg['Subject']))
+
+        myobj6 = gTTS(text = 'From'+emailMsg['From']+ 'And Your Subject: '+str(emailMsg['Subject']), lang = 'en')
+        myobj6.save('subject.mp3')
+        playsound('subject.mp3')
+
+        ### loop available for multiparts in mail
+        for part in emailMsg.walk():
+            if part.get_content_type() == 'text/plain': 
+                body = part.get_payload(decode = True)
+                saveString = str("D:Dumpgmailemail_" +str(x) + ".eml")
+                ### location on disk
+                myfile = open(saveString, 'a')
+                myfile.write(body.decode('utf-8'))
+                myfile.close()
+            else:
+                continue
+        email.close()
+        email.logout()
