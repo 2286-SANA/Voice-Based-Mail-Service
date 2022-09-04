@@ -1,3 +1,5 @@
+python code:----------------------------
+
 import speech_recognition as sr
 from gtts import gTTS
 from playsound import playsound #playsound is a module which contains playsound function used to playsound
@@ -5,13 +7,14 @@ import smtplib
 import imaplib
 import email
 
-#google text to speech
+#google text to speech-------------------------------
 ## fetching project name 
 print('             Welcome! To Voice Based Email for Blind') 
 project = gTTS(text = 'Project: Voice Based Email for blind', lang = 'en')
 project.save('fetching.mp3')
 playsound('fetching.mp3')
-## choosing the option
+
+## choosing the option------------------------------
 print('1. Compose a mail')
 myobj1 = gTTS(text = 'Option 1 compose a mail', lang = 'en')
 myobj1.save('option1.mp3')
@@ -25,7 +28,7 @@ choice = gTTS(text = 'Choose one option', lang = 'en')
 choice.save('choose.mp3')
 playsound('choose.mp3')
 
-#VOICE RECOGNITION
+#VOICE RECOGNITION--------------------------------
 r = sr.Recognizer()
 r.energy_threshold = 100
 
@@ -39,22 +42,25 @@ try:
 except sr.UnknownValueError:
     print("Google Speech Recognition could not understand audio.")
 
-#FOR COMPOSING A MAIL
+#FOR COMPOSING A MAIL-----------------------------
 if text == '1' or text == 'one' or text == 'One' or text == 'won' or text == 'option 1':
     myobj3 = gTTS(text ='You chose option 1.', lang = 'en')
     myobj3.save('compose.mp3')
     playsound('compose.mp3')
     emailList = ['arunkgarg18@gmail.com','shreyagarg292001@gmail.com','pranshu040405@gmail.com','shanug2001@gmail.com']
-    # sending mail to gmail accout
+    
+    # sending mail to gmail accout------------------------------------------
     for dest in emailList:
         smail = smtplib.SMTP('smtp.gmail.com', 587)  ## creating SMTP session
         smail.ehlo()
         smail.starttls() ## creting tls for security
         smail.ehlo()
         smail.login('shrugarg29@gmail.com','shreyagarg@29')  ## authetication
-        ## Message to be sent
+        
+        ## Message to be sent-----------------------------------------
         msg = 'Hi! hope you are doing well'
-        ## Sending mail
+        
+        ## Sending mail-----------------------------------------
         smail.sendmail('shrugarg29@gmail.com', dest, msg)
         print('\nCongratulations! Your mail has been send.')
         myobj4 = gTTS(text = 'Congratulations! Your mail has been send.', lang = 'en')
